@@ -60,12 +60,14 @@
         }
 
         .history-item:hover {
-            background:rgba(56, 116, 255, 0.05);
+/*            background:rgba(56, 116, 255, 0.05);*/
+            background: rgb(219 234 254);
             z-index: 2;
         }
         .history-item.active {
-            background: rgb(219 234 254);
-            color: rgb(38 38 38);
+            background: #3874ff;
+/*            color: rgb(38 38 38);*/
+            color: white;
         }
 
 
@@ -93,11 +95,13 @@
             border: none;
             padding: 4px;
             cursor: pointer;
-            color: #666;
+/*            color: #666;*/
+            color: white;
         }
 
         .action-btn:hover {
-            color: #3874ff;
+/*            color: #3874ff;*/
+              color: #666;
         }
 
         .action-menu {
@@ -108,6 +112,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
             z-index: 1;
+            color: rgb(38 38 38);
 /*            display: none;*/
         }
 
@@ -302,9 +307,10 @@
             margin: 0;
             max-height: 390px;
             box-sizing: border-box;
-            word-break: break-word0;
+            word-break: break-word;
             white-space: pre-wrap;
             overflow: auto;
+            transition: border-color 0.3s;
 
         }
 
@@ -313,7 +319,6 @@
             outline: none;
             box-shadow: none;
 /*            border: 2px solid #007bff;*/
-
         }
 
         .send {
@@ -503,6 +508,9 @@
                 text-align: left;
                 word-break: break-all;
             }
+            .top.screenshot_fix,.topnav.screenshot_fix,.input-container.screenshot_fix,.bottomnode.screenshot_fix{
+                display: none;
+            }
         }
 
 
@@ -601,6 +609,126 @@
           opacity: 0;
         }
       }
+/*        模态输入框部分*/
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 0.6s forwards;
+        }
+
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-50px);
+            animation: slideIn 0.6s forwards;
+            min-width: 300px;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-exit {
+            animation: fadeOut 0.4s forwards;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .modal-message {
+            text-align: center;
+        }
+
+        textarea {
+            flex-grow: 1;
+            padding: 14px 18px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: none;
+            margin: 0;
+            max-height: 390px;
+            box-sizing: border-box;
+            word-break: break-word0;
+            white-space: pre-wrap;
+            overflow: auto;
+        }
+
+        textarea:focus {
+            border-color: #387fff;
+            outline: none;
+            box-shadow: none;
+            /*            border: 2px solid #007bff;*/
+        }
+
+        .modal-input {
+            /*            width: 94%;*/
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-evenly;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .modal-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .confirm-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            background: #0056b3;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -628,7 +756,7 @@
         <div class="input-container">
             <!-- <input type="text" id="input" placeholder="输入你的问题..." /> -->
             <textarea id="input" placeholder="给 DeepSeek 发送消息 " rows="2"></textarea>
-            <button class="send" onclick="sendMessage()">发&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;送</button>
+            <button class="send" onclick="sendMessage()">发&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;送</button>
         </div>
         <div class="bottomnode"></div>
     </div>
@@ -725,39 +853,6 @@
         //     // menu.classList.toggle('show');
         // }
 
-        function deleteConversation(id) {
-            if (confirm('确定要删除这个对话吗？')) {
-                conversations = conversations.filter(conv => conv.id !== id);
-                if (currentConversationId === id) {
-                    currentConversationId = conversations[0]?.id || '';
-                    document.getElementById('messages').innerHTML = '';
-                }
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-                initHistory();
-            }
-        }
-        // // 添加全局点击关闭菜单的事件
-        // document.addEventListener('click', (e) => {
-        //     if (!e.target.closest('.action-menu') && !e.target.closest('.action-btn')) {
-        //         document.querySelectorAll('.action-menu').forEach(menu => 
-        //             menu.classList.remove('show')
-        //         );
-        //     }
-        // });
-
-        function renameConversation(id) {
-            const newTitle = prompt('请输入新的对话标题：');
-            if (newTitle) {
-                const conversation = conversations.find(conv => conv.id === id);
-                if (conversation) {
-                    conversation.title = newTitle.substring(0, 50);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-                    initHistory();
-                }
-            }
-        }
-
-
 
         // 保存对话
         function saveConversation() {
@@ -810,7 +905,7 @@
             messagesDiv.innerHTML = conversation.messages.map(msg => `
                 <div class="message ${msg.role}-message">${msg.role === 'ai' ? msg.content : msg.content}</div>
             `).join('');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            // messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
         window.toggleThinking = (header) => {
@@ -845,7 +940,6 @@
             } else {
                 messageDiv.textContent = content;
             }
-
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
@@ -869,17 +963,17 @@
             }
           };
         }
-
-        if(isGenerating == true){
-            //监听滚动，判断是否滚动到底，若滚动到底则程序自动操作滚动条，让用户能实时浏览AI最新的生成内容
-            document.getElementById('messages').addEventListener('scroll', throttle(() => {
-                // console.log(checkScrollToBottom());
-              if (checkScrollToBottom()) {
-                const messagesDiv = document.getElementById('messages');
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-              }
-            }, 500));
-        }
+        // if(isGenerating == true){
+        //     //监听滚动，判断是否滚动到底，若滚动到底则程序自动操作滚动条，让用户能实时浏览AI最新的生成内容
+        //     document.getElementById('messages').addEventListener('scroll', throttle(() => {
+        //         // console.log(checkScrollToBottom());
+        //         console.log("scroll触发了");
+        //       if (checkScrollToBottom()) {
+        //         const messagesDiv = document.getElementById('messages');
+        //         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        //       }
+        //     }, 500));
+        // }
 
         async function generateAIResponse(prompt) {
             isGenerating = true;
@@ -921,7 +1015,7 @@
                 let thinkingContent = '';
                 let thinkingDiv = null; // 新增思考内容容器引用
 
-                let isFirst = true; // 标记变量
+                // let isFirst = true; // 标记变量
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
@@ -1027,11 +1121,11 @@
                 if (loadingDiv.parentNode) {
                     messagesDiv.removeChild(loadingDiv);
                 }
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                // messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
         }
 
-        // 初始化代码高亮并组织code元素的事件冒泡
+        // 初始化代码高亮并阻止code元素的事件冒泡
         setInterval(() => {
             document.querySelectorAll('pre code').forEach(block => {
                 hljs.highlightElement(block);
@@ -1040,7 +1134,6 @@
                     event.stopPropagation();
                 }, { passive: true }); // 推荐添加 passive 提升滚动性能
             });
-            // console.log(document.querySelectorAll('pre code'));
         }, 1000);
 
         // 初始化历史记录
@@ -1050,7 +1143,6 @@
         // // console.log(history[0].id);
         loadConversation(history[0].id);
         const tabs = document.querySelectorAll('.history-item');
-        // // console.log(tabs);
         tabs[0].classList.add('active');
         
         // 回车发送
@@ -1134,9 +1226,6 @@
           }
         });
 
-
-
-
         // 截取对话页面
         // async function captureFullPage() {
         //   const page = document.getElementById('messages'); // 获取整个页面元素
@@ -1157,17 +1246,15 @@
 
         // // 调用函数
         // captureFullPage();
+      //切换至适合手机长截屏视图
       async function switchview() {
           const elements = document.querySelectorAll('.top,.topnav,.input-container,.bottomnode');
           elements.forEach(element => {
-            // console.log(element);
-            element.remove();
+            element.classList.toggle('screenshot_fix');
           });
           const code_elements = document.querySelectorAll('code');
-          console.log(code_elements);
           code_elements.forEach(element => {
-            console.log(element);
-            element.classList.add('screenshot_fix');
+            element.classList.toggle('screenshot_fix');
           });
           //   const page = document.getElementById('messages'); // 获取整个页面元素
           // const canvas = await html2canvas(page, {
@@ -1229,6 +1316,145 @@
           // link.click();
       }
 
+
+        // // 添加全局点击关闭菜单的事件
+        // document.addEventListener('click', (e) => {
+        //     if (!e.target.closest('.action-menu') && !e.target.closest('.action-btn')) {
+        //         document.querySelectorAll('.action-menu').forEach(menu => 
+        //             menu.classList.remove('show')
+        //         );
+        //     }
+        // });
+
+        //封装输入模态框
+        function customPrompt(message = '请输入', defaultValue = '') {
+            return new Promise((resolve) => {
+                // 创建遮罩层 
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                // 创建模态框内容 
+                const modal = document.createElement('div');
+                modal.className = 'modal-content';
+                // 构建内容结构 
+                modal.innerHTML = ` <div class="modal-message">${message}</div><textarea class="modal-input" id="input" rows="2">${defaultValue}</textarea><div class="modal-buttons"> <button class="modal-button cancel-btn">取消</button> <button class="modal-button confirm-btn">确定</button> </div> `;
+                // 获取元素引用 
+                const input = modal.querySelector('.modal-input');
+                const confirmBtn = modal.querySelector('.confirm-btn');
+                const cancelBtn = modal.querySelector('.cancel-btn');
+                // 确定按钮点击处理 
+                const handleConfirm = () => {
+                    overlay.classList.add('modal-exit');
+                    overlay.addEventListener('animationend', () => {
+                        overlay.remove();
+                        resolve(input.value);
+                    }, { once: true });
+                };
+                // 取消按钮点击处理 
+                const handleCancel = () => {
+                    overlay.classList.add('modal-exit');
+                    overlay.addEventListener('animationend', () => {
+                        overlay.remove();
+                        resolve(null);
+                    }, { once: true });
+                };
+                // 事件监听 
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+                input.addEventListener('keypress', (e) => e.key === 'Enter' && handleConfirm());
+                // 添加到DOM 
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+            });
+        }
+        // 使用示例 
+        // customPrompt('请输入新的对话标题', '当前对话标题').then(res => console.log(res)); 
+
+       // 重命名模态框部分
+        function renameConversation(id) {
+            toggleSidebar();
+            const conversation = conversations.find(conv => conv.id === id);
+            // console.log(conversation.title); 
+            let newTitle;
+            customPrompt('请输入新的对话标题',conversation.title).then(res => {
+                newTitle = res;
+                if (newTitle) {
+                    if (conversation) {
+                        conversation.title = newTitle.substring(0, 50);
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+                        initHistory();
+                    }
+                }
+            }).catch(error => {
+                console.error('出错了:',error);
+            });
+
+        }
+
+        //封装确认模态框
+        function customConfirm(message = '是否确认删除？') {
+            return new Promise((resolve) => {
+                // 创建遮罩层 
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                // 创建模态框内容 
+                const modal = document.createElement('div');
+                modal.className = 'modal-content';
+                // 构建内容结构 
+                modal.innerHTML = ` <div class="modal-message">${message}</div><div class="modal-buttons"> <button class="modal-button cancel-btn">取消</button> <button class="modal-button confirm-btn">确定</button> </div> `;
+                // 获取元素引用 
+                const confirmBtn = modal.querySelector('.confirm-btn');
+                const cancelBtn = modal.querySelector('.cancel-btn');
+                // 确定按钮点击处理 
+                const handleConfirm = () => {
+                    overlay.classList.add('modal-exit');
+                    overlay.addEventListener('animationend', () => {
+                        overlay.remove();
+                        resolve(true);
+                    }, { once: true });
+                };
+                // 取消按钮点击处理 
+                const handleCancel = () => {
+                    overlay.classList.add('modal-exit');
+                    overlay.addEventListener('animationend', () => {
+                        overlay.remove();
+                        resolve(false);
+                    }, { once: true });
+                };
+                // 事件监听 
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+                // 添加到DOM 
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+            });
+        }
+        // 确认/取消模态框部分
+        function deleteConversation(id) {
+            toggleSidebar();
+            customConfirm('确定要删除这个对话吗?').then(res => {
+                confirm = res;
+                if (confirm) {
+                    conversations = conversations.filter(conv => conv.id !== id);
+                    if (currentConversationId === id) {
+                        currentConversationId = conversations[0]?.id || '';
+                        document.getElementById('messages').innerHTML = '';
+                    }
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+                    initHistory();
+                }
+            }).catch(error => {
+                console.error('出错了:',error);
+            });
+            // if (confirm('确定要删除这个对话吗？')) {
+            //     conversations = conversations.filter(conv => conv.id !== id);
+            //     if (currentConversationId === id) {
+            //         currentConversationId = conversations[0]?.id || '';
+            //         document.getElementById('messages').innerHTML = '';
+            //     }
+            //     localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+            //     initHistory();
+            // }
+        }
     </script>
 </body>
 </html>
