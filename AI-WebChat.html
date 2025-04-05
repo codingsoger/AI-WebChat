@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSeek AI Chat</title>
+    <title>DeepSeek AI WebChat</title>
     <!-- Markdown渲染库 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- 代码高亮 -->
@@ -87,9 +87,6 @@
         .history-item:hover .item-actions:hover .action-menu{
             display: block;
         }
-        .item-actions:hover{
-
-        }
 
         .action-btn {
             background: none;
@@ -171,9 +168,10 @@
 
         .message {
             max-width: 100%;
-            padding: 12px 16px;
+            padding: 12px 12px;
             border-radius: 18px;
             line-height: 1.6;
+            text-align: justify;
 
         }
 
@@ -204,10 +202,10 @@
 
         .ai-message pre {
             background: white;
-            padding: 16px;
+/*            padding: 10px;*/
             border-radius: 8px;
             overflow-x: auto;
-            margin: 16px 0;
+            margin: 8px 0;
             border: 1px solid #ddd;
         }
 
@@ -247,7 +245,7 @@
         }
 
         .thinking-content {
-            padding: 8px 16px;
+            padding: 8px 8px;
             background: white;
             border-radius: 0 0 12px 12px;
 /*            max-height: 300px;*/
@@ -255,6 +253,7 @@
             font-size: 0.8em;
             line-height: 1.5;
             color: #8b8b8b;
+            text-align: justify;
         }
 
         .thinking-content pre {
@@ -448,7 +447,7 @@
             }
 
             .messages {
-                padding: 10px 5% 0px;
+                padding: 10px 2% 0px;
             }
 
             .input-container {
@@ -498,6 +497,11 @@
             /* 隐藏PC版新对话按钮 */
             .new_chat {
                 display: none;
+            }
+            code.screenshot_fix{
+                white-space: break-spaces;
+                text-align: left;
+                word-break: break-all;
             }
         }
 
@@ -630,7 +634,7 @@
     </div>
 
     <script>
-        const API_KEY = 'sk-your_deepseek_sk';
+        const API_KEY = 'sk-0047cf9aee094a6fa673299921df4d80';
         const API_URL = 'https://api.deepseek.com/v1/chat/completions';
         const STORAGE_KEY = 'deepseek_chat_history';
         
@@ -638,7 +642,7 @@
         let isGenerating = false;
         let currentConversationId = Date.now().toString();
         let conversations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        const messages_prompt = [{ role: "system", content: "你是淞仔的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是淞仔的专属小助手，请问有什么可以帮您？" }];
+        const messages_prompt = [{ role: "system", content: "你是淞仔的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是xx的专属小助手，请问有什么可以帮您？" }];
 
         function createNewConversation() {
             // 保存当前对话
@@ -865,15 +869,17 @@
             }
           };
         }
-        //监听滚动，判断是否滚动到底，若滚动到底则程序自动操作滚动条，让用户能实时浏览AI最新的生成内容
-        document.getElementById('messages').addEventListener('scroll', throttle(() => {
-            // console.log(checkScrollToBottom());
-          if (checkScrollToBottom()) {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-          }
-        }, 500));
 
+        if(isGenerating == true){
+            //监听滚动，判断是否滚动到底，若滚动到底则程序自动操作滚动条，让用户能实时浏览AI最新的生成内容
+            document.getElementById('messages').addEventListener('scroll', throttle(() => {
+                // console.log(checkScrollToBottom());
+              if (checkScrollToBottom()) {
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+              }
+            }, 500));
+        }
 
         async function generateAIResponse(prompt) {
             isGenerating = true;
@@ -1025,7 +1031,7 @@
             }
         }
 
-        // 初始化代码高亮
+        // 初始化代码高亮并组织code元素的事件冒泡
         setInterval(() => {
             document.querySelectorAll('pre code').forEach(block => {
                 hljs.highlightElement(block);
@@ -1096,15 +1102,13 @@
         let touchStartX = 0;
         const swipeThreshold = 50; // 滑动阈值（像素）
         const verticalThreshold = 30; // 垂直方向容差
-        // const scroll_codenode = document.getElementsByClassName("hljs");
-        // console.log(scroll_codenode)
 
-        document.querySelectorAll('pre code').forEach(item => {
-            item.addEventListener("touchstart", (event) => {
-              // 阻止code元素的事件冒泡到父元素body
-              event.stopPropagation();
-            }, { passive: true }); // 推荐添加 passive 提升滚动性能            
-        });
+        // document.querySelectorAll('pre code').forEach(item => {
+        //     item.addEventListener("touchstart", (event) => {
+        //       // 阻止code元素的事件冒泡到父元素body
+        //       event.stopPropagation();
+        //     }, { passive: true }); // 推荐添加 passive 提升滚动性能            
+        // });
 
         document.body.addEventListener('touchstart', e => {
             // console.log(!scroll_codenode.contains(e.target));
@@ -1158,7 +1162,13 @@
           elements.forEach(element => {
             // console.log(element);
             element.remove();
-          })
+          });
+          const code_elements = document.querySelectorAll('code');
+          console.log(code_elements);
+          code_elements.forEach(element => {
+            console.log(element);
+            element.classList.add('screenshot_fix');
+          });
           //   const page = document.getElementById('messages'); // 获取整个页面元素
           // const canvas = await html2canvas(page, {
           //   scrollY: -window.scrollY, // 处理滚动偏移
