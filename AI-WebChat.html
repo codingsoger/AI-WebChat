@@ -54,7 +54,6 @@
             cursor: pointer;
             transition: background 0.2s;
             white-space: nowrap;
-            
             position: relative;
         }
         .item-content{
@@ -73,8 +72,6 @@
 /*            color: rgb(38 38 38);*/
             color: white;
         }
-
-
 
         .item-actions {
             position: absolute;
@@ -117,15 +114,11 @@
             border-radius: 8px;
             z-index: 1;
             color: rgb(38 38 38);
-/*            display: none;*/
         }
 
         .item-actions.show {
             display: block;
         }
-/*        .action-menu.show {
-            display: block;
-        }*/
 
         .menu-item {
             padding: 8px 16px;
@@ -141,8 +134,6 @@
             background: #f5f5f5;
         }
 
-
-
         .chat-container {
             flex: 1;
 /*            max-width: 1200px;*/
@@ -155,7 +146,6 @@
             flex-direction: column;
             width: 100%;
             height: calc(100vh - 40px);
-
 /*            height: 100vh;*/
         }
 
@@ -182,8 +172,6 @@
             line-height: 1.6;
             text-align: justify;
             word-break: break-all;
-/*            white-space: break-spaces;*/
-
         }
 
         .user-message {
@@ -509,14 +497,14 @@
             .new_chat {
                 display: none;
             }
-            code.screenshot_fix{
+            pre.screenshot_fix,code.screenshot_fix{
                 white-space: break-spaces;
                 text-align: left;
                 word-break: break-all;
             }
-            .top.screenshot_fix,.topnav.screenshot_fix,.input-container.screenshot_fix,.bottomnode.screenshot_fix{
+/*            .top.screenshot_fix,.topnav.screenshot_fix,.input-container.screenshot_fix,.bottomnode.screenshot_fix{
                 display: none;
-            }
+            }*/
         }
 
 
@@ -1325,11 +1313,13 @@
       async function switchview() {
             const elements = document.querySelectorAll('.top,.topnav,.input-container,.bottomnode');
             elements.forEach(element => {
-              element.classList.toggle('screenshot_fix');
+              // element.classList.toggle('screenshot_fix');
+                element.remove();
             });
-            const code_elements = document.querySelectorAll('code');
+            const code_elements = document.querySelectorAll('pre,code');
+            console.log(code_elements);
             code_elements.forEach(element => {
-              element.classList.toggle('screenshot_fix');
+              element.classList.add('screenshot_fix');
             });
             Toast.fire({
               showClass: {
