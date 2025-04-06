@@ -763,6 +763,7 @@
         
         let isSidebarOpen = false;
         let isGenerating = false;
+        let isInshotcutview = false;
         let currentConversationId = Date.now().toString();
         let conversations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const messages_prompt = [{ role: "system", content: "你是淞仔的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是xx的专属小助手，请问有什么可以帮您？" }];
@@ -961,8 +962,27 @@
 
         // 发送消息函数保持不变，增加保存逻辑
         async function sendMessage() {
-            if (isGenerating) return;
-
+            if (isGenerating) {
+                Toast.fire({
+                  // showClass: {
+                  //   popup: `
+                  //     animate__animated
+                  //     animate__fadeInDown
+                  //     animate__faste
+                  //   `
+                  // },
+                  // hideClass: {
+                  //   popup: `
+                  //     animate__animated
+                  //     animate__backOutUp
+                  //     animate__faste
+                  //   `
+                  // },
+                  icon: "info",
+                  title: "AI生成中~ 请稍后再提问吧"
+                });                
+                return;
+            }
             const input = document.getElementById('input');
             const message = input.value.trim();
             if (!message) {
@@ -1189,14 +1209,16 @@
         }
 
         // 初始化代码高亮并阻止code元素的事件冒泡
-        setInterval(() => {
+        let timer = setInterval(() => {
             document.querySelectorAll('pre code').forEach(block => {
                 hljs.highlightElement(block);
                 block.addEventListener("touchstart", (event) => {
                     // 阻止code元素的事件冒泡到父元素body（避免在这类元素上左右滑动时触发body的监听事件）
                     event.stopPropagation();
-                }, { passive: true }); // 推荐添加 passive 提升滚动性能
+                }, { passive: true }); // 推荐添加 passive 提升滚动性能 
+                // console.log('阻止了code元素的事件冒泡')
             });
+            console.log('timerruning')
         }, 1000);
 
         // 初始化历史记录
@@ -1314,6 +1336,9 @@
         // captureFullPage();
         //切换至适合手机长截屏视图
         async function switchview() {
+            isInshotcutview = true;
+            //重新为body添加监听，取消之前对code元素设置的阻止事件冒泡?
+            
             const elements = document.querySelectorAll('.top,.topnav,.input-container,.bottomnode');
             elements.forEach(element => {
               // element.classList.toggle('screenshot_fix');
@@ -1321,8 +1346,9 @@
             });
             const code_elements = document.querySelectorAll('pre,code');
             console.log(code_elements);
+            // clearInterval(timer);
             code_elements.forEach(element => {
-              element.classList.add('screenshot_fix');
+                element.classList.add('screenshot_fix');
             });
             Toast.fire({
               showClass: {
@@ -1472,7 +1498,9 @@
             });
         }
         // 使用示例 
-        // customPrompt('请输入新的对话标题', '当前对话标题').then(res => console.log(res)); 
+        // customPrompt('请输入新的对话标题', '当前对话标题').then(res => {
+        //     console.log(res);
+        // }); 
        // 重命名模态框部分
         function renameConversation(id) {
             // toggleSidebar();
