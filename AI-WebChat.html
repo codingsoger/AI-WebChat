@@ -1266,29 +1266,32 @@
         // });
 
         document.body.addEventListener('touchstart', e => {
-            // console.log(!scroll_codenode.contains(e.target));
+            if(!isModalOpen){
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
+            }
+            // console.log(!scroll_codenode.contains(e.target));
         });
 
         document.body.addEventListener('touchend', e => {
-          const touchEndX = e.changedTouches[0].clientX;
-          const deltaX = touchEndX - touchStartX;
-          const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY);
-          // 判断右滑条件
-          if (deltaX > 0 && deltaX > swipeThreshold && deltaY < verticalThreshold) {
-            const sidebar = document.getElementById('historySidebar');
-            isSidebarOpen = true;
-            sidebar.classList.add('active');
-          }
-          // 判断左滑条件
-          if (deltaX <0 && Math.abs(deltaX) > swipeThreshold && deltaY < verticalThreshold) {
-            const sidebar = document.getElementById('historySidebar');
-            isSidebarOpen = false;
-            sidebar.classList.remove('active');
-          }
+            if(!isModalOpen){
+                  const touchEndX = e.changedTouches[0].clientX;
+                  const deltaX = touchEndX - touchStartX;
+                  const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+                  // 判断右滑条件
+                  if (deltaX > 0 && deltaX > swipeThreshold && deltaY < verticalThreshold) {
+                    const sidebar = document.getElementById('historySidebar');
+                    isSidebarOpen = true;
+                    sidebar.classList.add('active');
+                  }
+                  // 判断左滑条件
+                  if (deltaX <0 && Math.abs(deltaX) > swipeThreshold && deltaY < verticalThreshold) {
+                    const sidebar = document.getElementById('historySidebar');
+                    isSidebarOpen = false;
+                    sidebar.classList.remove('active');
+                  }
+            }
         });
-
         // 截取对话页面
         // async function captureFullPage() {
         //   const page = document.getElementById('messages'); // 获取整个页面元素
@@ -1309,8 +1312,8 @@
 
         // // 调用函数
         // captureFullPage();
-      //切换至适合手机长截屏视图
-      async function switchview() {
+        //切换至适合手机长截屏视图
+        async function switchview() {
             const elements = document.querySelectorAll('.top,.topnav,.input-container,.bottomnode');
             elements.forEach(element => {
               // element.classList.toggle('screenshot_fix');
@@ -1397,7 +1400,7 @@
           // link.download = 'fullpage-screenshot.png';
           // link.href = img;
           // link.click();
-      }
+        }
 
 
         // // 添加全局点击关闭菜单的事件
@@ -1426,11 +1429,17 @@
                 const cancelBtn = modal.querySelector('.cancel-btn');
                 // 确定按钮点击处理 
                 const handleConfirm = () => {
-                    overlay.classList.add('modal-exit');
-                    overlay.addEventListener('animationend', () => {
-                        overlay.remove();
-                        resolve(input.value);
-                    }, { once: true });
+                    if(input.value.trim() == defaultValue.trim()){
+                        alert("输入内容与原来相同!");
+                    }else if(input.value.trim() == ''){
+                        alert('内容不允许为空!请重新输入');
+                    }else{
+                        overlay.classList.add('modal-exit');
+                        overlay.addEventListener('animationend', () => {
+                            overlay.remove();
+                            resolve(input.value);
+                        }, { once: true });
+                    }
                 };
                 // 取消按钮点击处理 
                 const handleCancel = () => {
@@ -1440,10 +1449,23 @@
                         resolve(null);
                     }, { once: true });
                 };
+                // 遮罩层点击处理
+                const handleOverlayClick = (e) => {
+                    // console.log(e.target);
+                    if(!modal.contains(e.target)){  //如果点击的是模态框内容外的区域就退出
+                        overlay.classList.add('modal-exit');
+                        overlay.addEventListener('animationend', () => {
+                            overlay.remove();
+                            resolve(null);
+                        }, { once: true });
+                    }
+                }
                 // 事件监听 
                 confirmBtn.addEventListener('click', handleConfirm);
                 cancelBtn.addEventListener('click', handleCancel);
+                overlay.addEventListener('click', handleOverlayClick);
                 input.addEventListener('keypress', (e) => e.key === 'Enter' && handleConfirm());
+
                 // 添加到DOM 
                 overlay.appendChild(modal);
                 document.body.appendChild(overlay);
@@ -1541,9 +1563,21 @@
                         resolve(false);
                     }, { once: true });
                 };
+                // 遮罩层点击处理
+                const handleOverlayClick = (e) => {
+                    // console.log(e.target);
+                    if(e.target === overlay){  //如果点击的是模态框遮罩层元素(非内部任何元素)就退出
+                        overlay.classList.add('modal-exit');
+                        overlay.addEventListener('animationend', () => {
+                            overlay.remove();
+                            resolve(false);
+                        }, { once: true });
+                    }
+                }
                 // 事件监听 
                 confirmBtn.addEventListener('click', handleConfirm);
                 cancelBtn.addEventListener('click', handleCancel);
+                overlay.addEventListener('click', handleOverlayClick);
                 // 添加到DOM 
                 overlay.appendChild(modal);
                 document.body.appendChild(overlay);
