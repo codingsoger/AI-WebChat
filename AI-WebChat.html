@@ -11,7 +11,11 @@
     <link rel="apple-touch-icon" href="https://cdn.deepseek.com/chat/icon.png">
     <link rel="icon" type="image/x-icon" href="https://chat.deepseek.com/favicon.svg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <!-- sweetalert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         /* 优化后的CSS */
         * {
@@ -435,7 +439,7 @@
                 left: -100%;
                 width: 60%;
                 height: 100vh;
-                z-index: 1000;
+                z-index: 100;
                 transition: left 0.3s;
                 padding-top: 50px;
                 background: rgba(255,255,255, 0.52);
@@ -624,6 +628,7 @@
             align-items: center;
             opacity: 0;
             animation: fadeIn 0.6s forwards;
+            z-index: 101;
         }
 
         .modal-content {
@@ -773,6 +778,19 @@
         let currentConversationId = Date.now().toString();
         let conversations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const messages_prompt = [{ role: "system", content: "你是淞仔的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是xx的专属小助手，请问有什么可以帮您？" }];
+        let isModalOpen = false;
+        const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+              // didOpen: (toast) => {
+              //   toast.onmouseenter = Swal.stopTimer;
+              //   toast.onmouseleave = Swal.resumeTimer;
+              // }
+        });
+
 
         function createNewConversation() {
             // 保存当前对话
@@ -786,6 +804,24 @@
                 });
                 tabs[0].classList.add('active');
                 loadConversation(cur_history_json[0].id);
+                Toast.fire({
+                  showClass: {
+                    popup: `
+                      animate__animated
+                      animate__fadeInDown
+                      animate__faste
+                    `
+                  },
+                  hideClass: {
+                    popup: `
+                      animate__animated
+                      animate__backOutUp
+                      animate__faste
+                    `
+                  },
+                  icon: "info",
+                  title: "已跳转至新对话"
+                });
                 return;
             }
             // 创建新对话
@@ -803,10 +839,27 @@
             
             // 更新存储
             localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-            
             // 清空消息区域并更新历史
             document.getElementById('messages').innerHTML = '';
             initHistory();
+            Toast.fire({
+              showClass: {
+                popup: `
+                  animate__animated
+                  animate__fadeInDown
+                  animate__faste
+                `
+              },
+              hideClass: {
+                popup: `
+                  animate__animated
+                  animate__backOutUp
+                  animate__faste
+                `
+              },
+              icon: "success",
+              title: "新对话创建成功"
+            });
         }
 
         // 初始化Markdown渲染
@@ -924,7 +977,27 @@
 
             const input = document.getElementById('input');
             const message = input.value.trim();
-            if (!message) return;
+            if (!message) {
+                Toast.fire({
+                  // showClass: {
+                  //   popup: `
+                  //     animate__animated
+                  //     animate__fadeInDown
+                  //     animate__faste
+                  //   `
+                  // },
+                  // hideClass: {
+                  //   popup: `
+                  //     animate__animated
+                  //     animate__backOutUp
+                  //     animate__faste
+                  //   `
+                  // },
+                  icon: "info",
+                  title: "请输入您的问题"
+                });
+                return;
+            } 
             input.value = '';
             addMessage(message, 'user');
             document.getElementById('input').style.height = 'auto';
@@ -1167,7 +1240,7 @@
         // 点击外部关闭侧边栏
         document.addEventListener('click', (e) => {
             const sidebar = document.getElementById('historySidebar');
-            if (isSidebarOpen && !sidebar.contains(e.target) && !e.target.closest('.mobile-menu')) {
+            if (isSidebarOpen && !isModalOpen && !sidebar.contains(e.target) && !e.target.closest('.mobile-menu')) {
                 toggleSidebar();
             }
         });
@@ -1250,14 +1323,32 @@
         // captureFullPage();
       //切换至适合手机长截屏视图
       async function switchview() {
-          const elements = document.querySelectorAll('.top,.topnav,.input-container,.bottomnode');
-          elements.forEach(element => {
-            element.classList.toggle('screenshot_fix');
-          });
-          const code_elements = document.querySelectorAll('code');
-          code_elements.forEach(element => {
-            element.classList.toggle('screenshot_fix');
-          });
+            const elements = document.querySelectorAll('.top,.topnav,.input-container,.bottomnode');
+            elements.forEach(element => {
+              element.classList.toggle('screenshot_fix');
+            });
+            const code_elements = document.querySelectorAll('code');
+            code_elements.forEach(element => {
+              element.classList.toggle('screenshot_fix');
+            });
+            Toast.fire({
+              showClass: {
+                popup: `
+                  animate__animated
+                  animate__fadeInDown
+                  animate__fast
+                `
+              },
+              hideClass: {
+                popup: `
+                  animate__animated
+                  animate__backOutUp
+                  animate__fast
+                `
+              },
+              icon: "info",
+              title: "已进入长截屏视图"
+            });
           //   const page = document.getElementById('messages'); // 获取整个页面元素
           // const canvas = await html2canvas(page, {
           //   scrollY: -window.scrollY, // 处理滚动偏移
@@ -1370,10 +1461,10 @@
         }
         // 使用示例 
         // customPrompt('请输入新的对话标题', '当前对话标题').then(res => console.log(res)); 
-
        // 重命名模态框部分
         function renameConversation(id) {
-            toggleSidebar();
+            // toggleSidebar();
+            isModalOpen = true;
             const conversation = conversations.find(conv => conv.id === id);
             // console.log(conversation.title); 
             let newTitle;
@@ -1385,7 +1476,45 @@
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
                         initHistory();
                     }
+                    Toast.fire({
+                      showClass: {
+                        popup: `
+                          animate__animated
+                          animate__fadeInDown
+                          animate__faste
+                        `
+                      },
+                      hideClass: {
+                        popup: `
+                          animate__animated
+                          animate__backOutUp
+                          animate__faste
+                        `
+                      },
+                      icon: "success",
+                      title: "修改成功"
+                    });
+                } else{
+                    Toast.fire({
+                      showClass: {
+                        popup: `
+                          animate__animated
+                          animate__fadeInDown
+                          animate__faste
+                        `
+                      },
+                      hideClass: {
+                        popup: `
+                          animate__animated
+                          animate__backOutUp
+                          animate__faste
+                        `
+                      },
+                      icon: "info",
+                      title: "已取消修改"
+                    });  
                 }
+                isModalOpen = false;
             }).catch(error => {
                 console.error('出错了:',error);
             });
@@ -1432,7 +1561,8 @@
         }
         // 确认/取消模态框部分
         function deleteConversation(id) {
-            toggleSidebar();
+            // toggleSidebar();
+            isModalOpen = true;
             customConfirm('确定要删除这个对话吗?').then(res => {
                 confirm = res;
                 if (confirm) {
@@ -1443,7 +1573,46 @@
                     }
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
                     initHistory();
+
+                    Toast.fire({
+                      showClass: {
+                        popup: `
+                          animate__animated
+                          animate__fadeInDown
+                          animate__faste
+                        `
+                      },
+                      hideClass: {
+                        popup: `
+                          animate__animated
+                          animate__backOutUp
+                          animate__faste
+                        `
+                      },
+                      icon: "info",
+                      title: "已删除"
+                    });
+                } else{
+                    Toast.fire({
+                      showClass: {
+                        popup: `
+                          animate__animated
+                          animate__fadeInDown
+                          animate__faste
+                        `
+                      },
+                      hideClass: {
+                        popup: `
+                          animate__animated
+                          animate__backOutUp
+                          animate__faste
+                        `
+                      },
+                      icon: "info",
+                      title: "已取消删除"
+                    });
                 }
+                isModalOpen = false;
             }).catch(error => {
                 console.error('出错了:',error);
             });
