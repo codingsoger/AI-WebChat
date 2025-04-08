@@ -781,10 +781,10 @@
               showConfirmButton: false,
               timer: 1500,
               timerProgressBar: true,
-              // didOpen: (toast) => {
-              //   toast.onmouseenter = Swal.stopTimer;
-              //   toast.onmouseleave = Swal.resumeTimer;
-              // }
+              didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+              }
         });
 
 
@@ -1466,13 +1466,15 @@
                         // alert("输入内容与原来相同!");
                         Swal.fire({
                           icon: "info",
-                          text: "修改内容无变化!"
+                          text: "修改内容无变化!",
+                          width: "20em"
                         });
                     }else if(input.value.trim() == ''){
                         // alert('内容不允许为空!请重新输入');
                         Swal.fire({
                           icon: "error",
-                          text: "新标题不允许为空!请重新修改"
+                          text: "新标题不允许为空!请重新修改",
+                          width: "20em"
                         });                        
                     }else{
                         overlay.classList.add('modal-exit');
