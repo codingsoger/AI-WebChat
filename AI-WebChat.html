@@ -630,7 +630,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transform: translateY(-50px);
-            animation: slideIn 0.6s forwards;
+/*            animation: slideIn 0.6s forwards;*/
             min-width: 300px;
             gap: 20px;
         }
@@ -1453,7 +1453,7 @@
                 overlay.className = 'modal-overlay';
                 // 创建模态框内容 
                 const modal = document.createElement('div');
-                modal.className = 'modal-content';
+                modal.className = 'modal-content animate__animated animate__bounceIn';
                 // 构建内容结构 
                 modal.innerHTML = ` <div class="modal-message">${message}</div><textarea class="modal-input" id="input" rows="3">${defaultValue}</textarea><div class="modal-buttons"> <button class="modal-button cancel-btn">取消</button> <button class="modal-button confirm-btn">确定</button> </div> `;
                 // 获取元素引用 
@@ -1463,9 +1463,17 @@
                 // 确定按钮点击处理 
                 const handleConfirm = () => {
                     if(input.value.trim() == defaultValue.trim()){
-                        alert("输入内容与原来相同!");
+                        // alert("输入内容与原来相同!");
+                        Swal.fire({
+                          icon: "info",
+                          text: "修改内容无变化!"
+                        });
                     }else if(input.value.trim() == ''){
-                        alert('内容不允许为空!请重新输入');
+                        // alert('内容不允许为空!请重新输入');
+                        Swal.fire({
+                          icon: "error",
+                          text: "新标题不允许为空!请重新修改"
+                        });                        
                     }else{
                         overlay.classList.add('modal-exit');
                         overlay.addEventListener('animationend', () => {
@@ -1576,7 +1584,7 @@
                 overlay.className = 'modal-overlay';
                 // 创建模态框内容 
                 const modal = document.createElement('div');
-                modal.className = 'modal-content';
+                modal.className = 'modal-content animate__animated animate__bounceIn';
                 // 构建内容结构 
                 modal.innerHTML = ` <div class="modal-message">${message}</div><div class="modal-buttons"> <button class="modal-button cancel-btn">取消</button> <button class="modal-button confirm-btn">确定</button> </div> `;
                 // 获取元素引用 
