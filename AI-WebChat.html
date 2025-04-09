@@ -779,7 +779,7 @@
         let isInshotcutview = false;
         let currentConversationId = Date.now().toString();
         let conversations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        let messages_prompt = [{ role: "system", content: "你是xx的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是xx的专属小助手，请问有什么可以帮您？" }];
+        const messages_prompt = [{ role: "system", content: "你是xx的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是xx的专属小助手，请问有什么可以帮您？" }];
         let isModalOpen = false;
         const Toast = Swal.mixin({
               toast: true,
