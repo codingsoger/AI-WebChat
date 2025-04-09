@@ -7,10 +7,12 @@
     <!-- Markdown渲染库 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- 代码高亮 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
     <link rel="apple-touch-icon" href="https://cdn.deepseek.com/chat/icon.png">
     <link rel="icon" type="image/x-icon" href="https://chat.deepseek.com/favicon.svg">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <!-- 加载 Dockerfile 语言模块 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/dockerfile.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
     <!-- sweetalert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -162,11 +164,11 @@
             margin: 0 auto;
 /*            gap: 24px;*/
         }
-        .messages::-webkit-scrollbar {
+/*        .messages::-webkit-scrollbar {
             width: 0;
             height: 0;
-            background: transparent; /* 可选背景透明 */
-        }
+            background: transparent; 
+        }*/
 
         .message {
             max-width: 100%;
@@ -378,6 +380,11 @@
                 height: auto;
                 min-height: 100vh;
                 position: relative;
+            }
+            .messages::-webkit-scrollbar {
+                width: 0;
+                height: 0;
+                background: transparent; 
             }
             .topnav{
                 box-sizing: border-box;
@@ -762,7 +769,6 @@
         </div>
         <div class="bottomnode"></div>
     </div>
-
     <script>
         const API_KEY = 'sk-0047cf9aee094a6fa673299921df4d80';
         const API_URL = 'https://api.deepseek.com/v1/chat/completions';
@@ -773,7 +779,7 @@
         let isInshotcutview = false;
         let currentConversationId = Date.now().toString();
         let conversations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        const messages_prompt = [{ role: "system", content: "你是xx的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是xx的专属小助手，请问有什么可以帮您？" }];
+        let messages_prompt = [{ role: "system", content: "你是xx的专属小助手，当有人询问关于你的身份时，你都应该直接这样回复：您好！我是xx的专属小助手，请问有什么可以帮您？" }];
         let isModalOpen = false;
         const Toast = Swal.mixin({
               toast: true,
@@ -861,6 +867,7 @@
         // 初始化Markdown渲染
         marked.setOptions({
             highlight: (code, lang) => {
+                hljs.registerLanguage('dockerfile', window.hljsDefineDockerfile); // 注册dockerfile语言。确保变量名匹配
                 return hljs.highlightAuto(code).value;
             },
             breaks: true,
@@ -1078,6 +1085,9 @@
             messagesDiv.appendChild(loadingDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             
+            // const cur_conversation = conversations.find(c => c.id === currentConversationId);
+            // console.log(cur_conversation);
+            
             messages_prompt.push({ role: "user", content: prompt });
             console.log(messages_prompt);
             try {
@@ -1223,9 +1233,7 @@
                     // 阻止code元素的事件冒泡到父元素body（避免在这类元素上左右滑动时触发body的监听事件）
                     event.stopPropagation();
                 }, { passive: true }); // 推荐添加 passive 提升滚动性能 
-                // console.log('阻止了code元素的事件冒泡')
             });
-            console.log('timerruning')
         }, 1000);
 
         // 初始化历史记录
